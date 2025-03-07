@@ -185,7 +185,15 @@ process filter_maf{
 
 process merge_chunks{
     
-    publishDir "${params.outdir}/${params.date}/annotation/${meta.sample_type}/${meta.patient}", mode: "copy"
+    publishDir( 
+         path: {"${params.outdir}/${params.date}/annotation/${meta.sample_type}/${meta.patient}"},
+         mode: "copy",
+         saveAs: { fn ->
+             fn.endsWith('.tsv') ? "${fn}":
+             fn.startsWith('.command') ? "logs/${fn}":
+             "full/${fn}"
+         }
+    )
     input:
         tuple val(meta), path(mafs), path(pass), path(nopass), path(vcfs)
     output:
